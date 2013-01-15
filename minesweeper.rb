@@ -33,12 +33,23 @@ class Board
     end
   end
 
-
   def choose_bomb_location(board)
     row = rand(0..board.length - 1)
     column = rand(0..board.length - 1)
     [row, column]
   end
+
+  # def display_bomb_board
+  #   @game_board.each do |row|
+  #     row.each do |item|
+  #       print "#{item.bomb} "
+  #     end
+  #     puts ""
+  #   end
+  # end
+
+
+
 end
 
 class BoardPosition
