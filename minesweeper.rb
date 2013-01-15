@@ -42,3 +42,21 @@ class Board
   end
 end
 
+class BoardPosition
+  attr_accessor :bomb, :visited, :adj_bombs
+
+  def initialize(bomb='', visited=false, adj_bombs=0)
+    @bomb = bomb
+    @visited = visited
+    @adj_bombs = adj_bombs
+  end
+
+
+  end
+
+end
+
+class Game
+
+
+end
