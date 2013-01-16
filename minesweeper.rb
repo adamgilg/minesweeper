@@ -13,9 +13,16 @@ class Board
   attr_reader :game_board
 
   def initialize(size)
-    @game_board = place_bombs(blank_board(size))
+    @game_board = build_board(size)
   end
 
+  def build_board(size)
+    board = place_bombs(blank_board(size))
+    visit_adjacents(board) do |item, adjacent_item| 
+      item.adj_bombs += 1 if adjacent_item.bomb == true
+    end
+
+  end
 
   def blank_board(size)
     empty_board = []
@@ -59,26 +66,27 @@ class Board
       end
       puts ""
     end
+    return nil
   end
 
-  def adjacents(row, column)
-    adjacents = []
+  def adjacents(row, column, board)
+    adjacents_array = []
 
     DELTAS.each do |delta|
       new_row = row + delta[0]
       new_column = column + delta[1]
-      if (0..@game_board.size - 1).include?(new_row) && (0..@game_board.size - 1).include?(new_column)
-        adjacents << @game_board[new_row][new_column]
+      if (0..board.size - 1).include?(new_row) && (0..board.size - 1).include?(new_column)
+        adjacents_array << board[new_row][new_column]
       end
     end
-    adjacents
+    adjacents_array
   end
 
-  def visit_adjacents(&set_adj)
-    @game_board.each_with_index do |row, row_index| 
+  def visit_adjacents(board, &set_adj)
+    board.each_with_index do |row, row_index| 
       row.each_with_index do |item, column_index|
 
-        adjacents_array = adjacents(row_index, column_index)
+        adjacents_array = adjacents(row_index, column_index, board)
         adjacents_array.each do |adjacent_item|
           #this line will be passed in as a block
           #ask Ned about passing in multiple variables to a block
@@ -118,22 +126,29 @@ class Game
   end
 
   def check_adjacents_zero(row, column)
-    if @board.game_board[row][column].flag == true
-      return
-    elsif @board.game_board[row][column].adj_bombs == 0 && @board.game_board[row][column].visited != true
-      @board.game_board[row][column].visited = true
+    current_position = @board.game_board[row][column]
 
-      adjacent_array = @board.adjacents(row, column)
-      adjacent_array.each { |item| check_adjacents_array(item.row, item.column) }
+    if current_position.flag
+      return
+    elsif current_position.adj_bombs == 0 && !current_position.visited
+      current_position.visited = true
+
+      adjacent_array = @board.adjacents(row, column, @board.game_board)
+      adjacent_array.each { |item| check_adjacents_zero(item.row, item.column) }
 
     else
-      @board.game_board[row][column].visited = true
+      current_position.visited = true
       return
     end
   end
 
   def display_game
+    print "  "
+    (0..8).each {|num| print "  #{num} "}
+    puts ""
+    row_num = 0
     @board.game_board.each do |row|
+      print "#{row_num}: "
       row.each do |item|
 
         if item.flag == true
@@ -145,7 +160,9 @@ class Game
         end
       end
       puts ""
+      row_num += 1
     end
+    return nil
   end
 
 
