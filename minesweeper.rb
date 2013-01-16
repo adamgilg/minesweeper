@@ -110,13 +110,17 @@ class BoardPosition
 end
 
 class Game
+  attr_accessor :board
+
   def initialize
     #change this to accept variable board size later
     @board = Board.new(9)
   end
 
   def check_adjacents_zero(row, column)
-    if @board.game_board[row][column].adj_bombs == 0 && @board.game_board[row][column].visited != true
+    if @board.game_board[row][column].flag == true
+      return
+    elsif @board.game_board[row][column].adj_bombs == 0 && @board.game_board[row][column].visited != true
       @board.game_board[row][column].visited = true
 
       adjacent_array = @board.adjacents(row, column)
@@ -125,6 +129,22 @@ class Game
     else
       @board.game_board[row][column].visited = true
       return
+    end
+  end
+
+  def display_game
+    @board.game_board.each do |row|
+      row.each do |item|
+
+        if item.flag == true
+          print "|f| "
+        elsif item.visited == true
+          print "|#{item.adj_bombs}| "
+        else
+          print "|*| "
+        end
+      end
+      puts ""
     end
   end
 
