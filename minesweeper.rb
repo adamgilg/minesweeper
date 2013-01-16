@@ -19,9 +19,9 @@ class Board
 
   def blank_board(size)
     empty_board = []
-    size.times do
+    size.times do |row_index|
       empty_row = []
-      size.times { empty_row << BoardPosition.new }
+      size.times { |column_index| empty_row << BoardPosition.new(row_index, column_index) }
       empty_board << empty_row
     end
     empty_board
@@ -96,18 +96,56 @@ class Board
 end
 
 class BoardPosition
-  attr_accessor :bomb, :visited, :adj_bombs, :flag
+  attr_accessor :bomb, :visited, :adj_bombs, :flag, :row, :column
 
-  def initialize(bomb=false, visited=false, adj_bombs=0, flag=false)
+  def initialize(row, column, bomb=false, visited=false, adj_bombs=0, flag=false)
     @bomb = bomb
     @visited = visited
     @adj_bombs = adj_bombs
     @flag = flag
+    @row = row
+    @column = column
   end
 
 end
 
 class Game
+  def initialize
+    #change this to accept variable board size later
+    @board = Board.new(9)
+  end
+
+  def check_adjacents_zero(row, column)
+    if @board.game_board[row][column].adj_bombs == 0 && @board.game_board[row][column].visited != true
+      @board.game_board[row][column].visited = true
+
+      adjacent_array = @board.adjacents(row, column)
+      adjacent_array.each { |item| check_adjacents_array(item.row, item.column) }
+
+    else
+      @board.game_board[row][column].visited = true
+      return
+    end
+  end
+
 
 
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
