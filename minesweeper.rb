@@ -59,15 +59,16 @@ class Board
     [row, column]
   end
 
-  def display_bomb_board
-    @game_board.each do |row|
-      row.each do |item|
-        print "#{item.adj_bombs}|#{item.bomb} "
-      end
-      puts ""
-    end
-    return nil
-  end
+#displays board for testing purposes
+  # def display_bomb_board
+  #   @game_board.each do |row|
+  #     row.each do |item|
+  #       print "#{item.adj_bombs}|#{item.bomb} "
+  #     end
+  #     puts ""
+  #   end
+  #   return nil
+  # end
 
   def adjacents(row, column, board)
     adjacents_array = []
@@ -83,23 +84,16 @@ class Board
   end
 
   def visit_adjacents(board, &set_adj)
-    board.each_with_index do |row, row_index| 
+    board.each_with_index do |row, row_index|
       row.each_with_index do |item, column_index|
 
         adjacents_array = adjacents(row_index, column_index, board)
         adjacents_array.each do |adjacent_item|
-          #this line will be passed in as a block
-          #ask Ned about passing in multiple variables to a block
-          #item.adj_bombs += 1 if adjacent_item.bomb == true
           set_adj.call(item, adjacent_item)
         end
       end
     end
   end
-          #blocks to be passed in to visit_adjacents
-          #{ |item, adjacent_item| item.adj_bombs += 1 if adjacent_item.bomb == true }
-          #this one is not finished.
-          # { continue going if item.adj_bombs == 0 }
 
 end
 
@@ -121,8 +115,9 @@ class Game
   attr_accessor :board
 
   def initialize(size)
+    @size = size
     #change this to accept variable board size later
-    @board = Board.new(size)
+    @board = Board.new(@size)
   end
 
   def check_reveal_move(row, column)
@@ -173,7 +168,7 @@ class Game
 
   def display_game
     print "  "
-    (0..8).each {|num| print "  #{num} "}
+    (0..@size).each {|num| print "  #{num} "}
     puts ""
     row_num = 0
 
@@ -223,6 +218,8 @@ class Game
     if @board.game_board[row_index][column_index].flag
       puts "Unflagging position #{row_index}, #{column_index}"
       @board.game_board[row_index][column_index].flag = false
+    elsif @board.game_board[row_index][column_index].visited
+      puts "Can't flag a visited square."
     else
       puts "Adding flag to position #{row_index}, #{column_index}"
       @board.game_board[row_index][column_index].flag = true
@@ -258,7 +255,11 @@ class User
 end
 
 def start
-  game = Game.new(9)
+  puts "What size game square would you like?"
+  puts "16 or 9"
+  print "> "
+  game_board_size = gets.chomp.to_i
+  game = Game.new(game_board_size)
   game.play
 end
 
