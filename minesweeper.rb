@@ -117,10 +117,10 @@ class BoardPosition
 
 end
 
-class Game(size)
+class Game
   attr_accessor :board
 
-  def initialize
+  def initialize(size)
     #change this to accept variable board size later
     @board = Board.new(size)
   end
@@ -143,12 +143,32 @@ class Game(size)
   end
 
   def lose?(row, column)
-    #checks if move is a bomb
-    #lose if so
+    if @board.game_board[row][column].bomb
+      puts "You lose!"
+      return true
+    else
+      return false
+    end
   end
 
   def win?
     #checks to see if all bombs are flagged and no flags on not-bombs
+    total_not_bomb = []
+    visited_not_bomb = []
+    @board.game_board.each do |row|
+      row.each do |item|
+        total_not_bomb << item if !item.bomb
+        visited_not_bomb << item if !item.bomb && item.visited
+      end
+    end
+
+    if visited_not_bomb.length == total_not_bomb.length
+      puts "Congratulations! You win."
+      display_game
+      return true
+    else
+      return false
+    end
   end
 
   def display_game
@@ -178,27 +198,58 @@ class Game(size)
 
   def process_user_move(move_string)
     move_array = move_string.split
-    row_index = move_array[1]
-    column_index = move_array[2]
+    row_index = move_array[1].to_i
+    column_index = move_array[2].to_i
 
     if move_array[0] == "r"
-      #@board.game_board[row_index][column_index].visited 
+      reveal(row_index, column_index)
+    elsif move_array[0] == "f"
+      flag_space(row_index, column_index)
+    end
   end
+
+  def reveal(row_index, column_index)
+    if @board.game_board[row_index][column_index].flag
+      puts "This position is flagged"
+      return
+    elsif lose?(row_index, column_index)
+      return true
+    else
+      check_reveal_move(row_index, column_index)
+      return true if win?
+    end
+  end
+
+  def flag_space(row_index, column_index)
+    if @board.game_board[row_index][column_index].flag
+      puts "Unflagging position #{row_index}, #{column_index}"
+      @board.game_board[row_index][column_index].flag = false
+    else
+      puts "Adding flag to position #{row_index}, #{column_index}"
+      @board.game_board[row_index][column_index].flag = true
+    end
+  end
+
 
   def play
-    #play this game.
-    until check_bomb?
     player = User.new
 
-    player.
+    while true
+      display_game
+      move = player.get_move
+      process_user_move(move)
+    end
 
   end
+
 end
 
 class User
-  def initialize
-  end
 
+  def get_move
+    print "Your move please: "
+    user_move = gets.chomp.downcase
+  end
 end
 
 def start
