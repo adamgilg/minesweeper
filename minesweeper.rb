@@ -117,15 +117,15 @@ class BoardPosition
 
 end
 
-class Game
+class Game(size)
   attr_accessor :board
 
   def initialize
     #change this to accept variable board size later
-    @board = Board.new(9)
+    @board = Board.new(size)
   end
 
-  def check_adjacents_zero(row, column)
+  def check_reveal_move(row, column)
     current_position = @board.game_board[row][column]
 
     if current_position.flag
@@ -142,11 +142,21 @@ class Game
     end
   end
 
+  def lose?(row, column)
+    #checks if move is a bomb
+    #lose if so
+  end
+
+  def win?
+    #checks to see if all bombs are flagged and no flags on not-bombs
+  end
+
   def display_game
     print "  "
     (0..8).each {|num| print "  #{num} "}
     puts ""
     row_num = 0
+
     @board.game_board.each do |row|
       print "#{row_num}: "
       row.each do |item|
@@ -159,17 +169,42 @@ class Game
           print "|*| "
         end
       end
+
       puts ""
       row_num += 1
     end
     return nil
   end
 
+  def process_user_move(move_string)
+    move_array = move_string.split
+    row_index = move_array[1]
+    column_index = move_array[2]
 
+    if move_array[0] == "r"
+      #@board.game_board[row_index][column_index].visited 
+  end
+
+  def play
+    #play this game.
+    until check_bomb?
+    player = User.new
+
+    player.
+
+  end
+end
+
+class User
+  def initialize
+  end
 
 end
 
-
+def start
+  game = Game.new(9)
+  game.play
+end
 
 
 
