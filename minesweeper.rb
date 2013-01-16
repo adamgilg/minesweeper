@@ -213,10 +213,9 @@ class Game
       puts "This position is flagged"
       return
     elsif lose?(row_index, column_index)
-      return true
+      @lose_game = true
     else
       check_reveal_move(row_index, column_index)
-      return true if win?
     end
   end
 
@@ -234,10 +233,16 @@ class Game
   def play
     player = User.new
 
-    while true
+    keep_playing = true
+    while keep_playing
       display_game
       move = player.get_move
       process_user_move(move)
+      if win?
+        keep_playing = false
+      elsif @lose_game
+        keep_playing = false
+      end
     end
 
   end
